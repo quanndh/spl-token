@@ -11,7 +11,8 @@ token = "GuWgBqrxvVP1UrD8FMVuSkDFfAJg5rjkS4aCwFamosFh"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "https://api.devnet.solana.com"
+#cluster = "https://api.devnet.solana.com"
+cluster = "Localnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]

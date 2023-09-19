@@ -6,11 +6,13 @@ contract token {
     // Creating a dataAccount is required by Solang
     // The account is unused in this example
     @payer(payer) // payer account
-    constructor() {}
+    constructor() {
+         
+    }
 
     function createTokenMint(
         address payer, // payer account
-        address mint, // mint account to be created
+        address mintAccount, // mint account to be created
         address mintAuthority, // mint authority for the mint account
         address freezeAuthority, // freeze authority for the mint account
         address metadata, // metadata account to be created
@@ -24,7 +26,7 @@ contract token {
         // Set mint authority, freeze authority, and decimals for the mint account
         SplToken.create_mint(
             payer,            // payer account
-            mint,            // mint account
+            mintAccount,            // mint account
             mintAuthority,   // mint authority
             freezeAuthority, // freeze authority
             decimals         // decimals
@@ -33,7 +35,7 @@ contract token {
         // Invoke Metadata Program to create a new account for the metadata account
         MplMetadata.create_metadata_account(
             metadata, // metadata account
-            mint,  // mint account
+            mintAccount,  // mint account
             mintAuthority, // mint authority
             payer, // payer
             payer, // update authority (of the metadata account)
@@ -41,5 +43,33 @@ contract token {
             symbol, // symbol
             uri // uri (off-chain metadata json)
         );
+    }
+
+    function balanceOf(address account) public view returns (uint64) {
+        return SplToken.get_balance(account);
+    }
+
+    function totalSupply(address mintAccount) public view returns (uint64) {
+        return SplToken.total_supply(mintAccount);
+    }
+
+    function mint(address mintAuthority, address tokenAccount, address mintAccount, uint64 amount) public {
+        // Mint tokens to the token account
+        SplToken.mint_to(
+            mintAccount, // mint account
+            tokenAccount, // token account
+            mintAuthority, // mint authority
+            amount // amount
+        );
+    }
+
+     // Transfer tokens from one token account to another via Cross Program Invocation to Token Program
+    function transfer(
+        address from, // token account to transfer from
+        address to, // token account to transfer to
+        uint64 amount // amount to transfer
+    ) public {
+        SplToken.TokenAccountData from_data = SplToken.get_token_account_data(from);
+        SplToken.transfer(from, to, from_data.owner, amount);
     }
 }
